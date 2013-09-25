@@ -20,3 +20,7 @@ calling phantomjs sendEvent method, with "keypress" event, after clicking in the
 Method wait waits for specified element to arrive on page (in case of ajax loading page parts, require.js scripts,
 et cetera). Please note when page loads (reloads) all timers like setInterval or setTimeout are cleared,
 and thus should be re-established.
+
+# Usage
+
+Just define desired fsm behaviour and then execute phantomjs fsm.coffee to see results.
