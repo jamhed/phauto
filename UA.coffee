@@ -1,4 +1,4 @@
-define [], () -> class UA
+class UA
    
    page: null
    state: "init"

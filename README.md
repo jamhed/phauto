@@ -21,6 +21,8 @@ Method wait waits for specified element to arrive on page (in case of ajax loadi
 et cetera). Please note when page loads (reloads) all timers like setInterval or setTimeout are cleared,
 and thus should be re-established.
 
+PhantomJS has a weird method of module includes, injectJs?
+
 # Usage
 
 Just define desired fsm behaviour and then execute phantomjs fsm.coffee to see results.
