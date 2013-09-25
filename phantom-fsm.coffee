@@ -28,7 +28,7 @@ class UA
          return console.log "No event #{ev} on state #{@state}"
 
       tr = @rules[@state][ev]
-      return unless tr
+
       @state = tr.newstate
       tr.fn.call(@, args) if tr.fn
 
