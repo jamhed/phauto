@@ -21,8 +21,11 @@ Method wait waits for specified element to arrive on page (in case of ajax loadi
 et cetera). Please note when page loads (reloads) all timers like setInterval or setTimeout are cleared,
 and thus should be re-established.
 
-PhantomJS has a weird method of module includes, injectJs?
+PhantomJs allows some kind of modularisation using require() functions, altough a weird one. You can see
+example module UA.cs and example test function defined in login.cs.
 
 # Usage
 
-Just define desired fsm behaviour and then execute phantomjs fsm.coffee to see results.
+Just define desired fsm behaviour and then execute phantomjs test.js to see results.
+
+$coffee -bc ./*.cs ; phantomjs ./test.js
