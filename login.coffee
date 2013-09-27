@@ -1,5 +1,4 @@
-root = exports ? this
-root.fn = (ua) ->
+module.exports = (ua) ->
 
    ua.then "открываем страницу", (uri) -> @page.open uri
    ua.then "подключаем к странице jquery", -> @page.includeJs "/js/lib/jquery.js", => @nextStep()

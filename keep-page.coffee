@@ -1,5 +1,4 @@
-root = exports ? this
-root.fn = (ua) ->
+module.exports = (ua) ->
 
    ua.then "переход на страницу программ", ->
       @cleanup()

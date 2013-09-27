@@ -1,6 +1,6 @@
-root = exports ? this
-root.class = class UA
-   
+module.exports = 
+class UA
+  
    page:    null
    steps:   null
    step:    null

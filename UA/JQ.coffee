@@ -1,6 +1,5 @@
-UA = require("./UA.js").class
-root = exports ? this
-root.class = class UAJQ extends UA
+module.exports = 
+class UAJQ extends require("t/UA.coffee")
    
    jQuery: (selector, fn) ->
       @page.evaluate ((selector, fn) -> return fn.call $(selector)), selector, fn
