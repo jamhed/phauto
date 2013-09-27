@@ -1,15 +1,13 @@
 root = exports ? this
 root.fn = (ua) ->
 
-   ua.tr "page/requested", "page/open", "open", ->
-      @page.includeJs "/js/lib/jquery.js", => @run "page/jquery"
-
-   ua.tr "open", "page/jquery", "ready", ->
+   ua.then "открываем страницу", (uri) -> @page.open uri
+   ua.then "подключаем к странице jquery", -> @page.includeJs "/js/lib/jquery.js", => @nextStep()
+   ua.then "заполняем форму логина", ->
       @text "input[name='name']", "admin"
       @text "input[name='password']", "admin"
       @click "input[type='submit']"
-
-   ua.tr "ready", "page/finish", "logged", ->
-      @wait "script[src^='/js/a/Source.js']", "ajax/finish"
-
+   ua.then "ждем загрузки всех скриптов", ->
+      @wait "script[src^='/js/a/Source.js']"
+      
    return ua

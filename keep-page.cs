@@ -1,37 +1,33 @@
 root = exports ? this
 root.fn = (ua) ->
 
-   ua.tr "logged", "ajax/finish", "logged", () ->
-      fs = require "fs"
-      fs.removeTree phantom.page.offlineStoragePath
-      
+   ua.then "переход на страницу программ", ->
+      @cleanup()
       @click "[href='#show']"
-      @wait "li[name='page']", "show/ready", (selector) => @innerText(selector) == "1 / 2"
+      @wait "li[name='page']", (selector) => @innerText(selector) == "1 / 2"
 
-   ua.tr "logged", "show/ready", "show", () ->
+   ua.then "проматываем на одну страницу вперед", ->
       @click_jq "li[name='forward']"
-      @wait "li[name='page']", "show/forward", (selector) => @innerText(selector) == "2 / 2"   
+      @wait "li[name='page']", (selector) => @innerText(selector) == "2 / 2"   
 
-   ua.tr "show", "show/forward", "show", ->
+   ua.then "переход на страницу событий", ->
       @click "[href='#event']"
-      @wait "li[name='page']", "ready", (selector) => @innerText(selector) == "1 / 1"
+      @state = "event page"
+      @wait "li[name='page']", (selector) => @innerText(selector) == "1 / 1"
 
-   ua.tr "show", "ready", "event", ->
+   ua.then "переход на страницу программ со страницы событий", ->
       @click "[href='#show']"
-      @wait "li[name='page']", "show/click", (selector) => @innerText(selector) == "2 / 2"
+      @state = "show page"
+      @wait "li[name='page']", (selector) => @innerText(selector) == "2 / 2"
 
-   ua.tr "event", "show/click", "show/edit", ->
+   ua.then "клик по кнопке добавить", ->
       @click "[pi='Create']"
-      @wait "[pi='a/Form'][processed=1]", "ready"
+      @wait ".cke_wysiwyg_frame"
 
-   ua.tr "show/edit", "ready", "show", ->
+   ua.then "возврат со страницы добавления программы", ->
       @page.goBack()
-      @wait "li[name='page']", "back", (selector) => @innerText(selector) == "2 / 2"
+      @wait "li[name='page']", (selector) => @innerText(selector) == "2 / 2"
 
-   ua.tr "show", "back", "show", ->
-      console.log "OK: сохранение выбранной страницы при переходах"
-      fs = require "fs"
-      fs.removeTree phantom.page.offlineStoragePath
-      phantom.exit()
+   ua.then "конец теста", -> @exit()
    
    return ua

@@ -7,11 +7,11 @@ root = typeof exports !== "undefined" && exports !== null ? exports : this;
 root["class"] = UA = (function() {
   UA.prototype.page = null;
 
-  UA.prototype.rules = null;
+  UA.prototype.steps = null;
 
-  UA.prototype.state = "init";
+  UA.prototype.step = null;
 
-  UA.prototype.debug = false;
+  UA.prototype.verbose = false;
 
   UA.prototype.retryTimeout = 100;
 
@@ -19,29 +19,23 @@ root["class"] = UA = (function() {
 
   function UA() {
     var _this = this;
-    this.rules = {};
+    this.steps = [];
     this.page = require("webpage").create();
     this.page.onResourceRequested = function(r) {
-      if (_this.debug) {
-        return console.log("request() " + r.url);
+      if (_this.verbose) {
+        return _this.debug("request() " + r.url);
       }
     };
     this.page.onLoadFinished = function(r) {
-      return _this.run("page/finish");
+      return _this.nextStep("onLoadFinished");
     };
-    this.tr("init", "page/open", "page/requested", function(uri) {
-      var _this = this;
-      return this.page.open(uri, function(status) {
-        return _this.run("page/open", status);
-      });
-    });
     this.page.onConsoleMessage = function(msg) {
-      if (_this.debug) {
-        return console.log("CONSOLE: " + msg);
+      if (_this.verbose) {
+        return _this.debug("CONSOLE: " + msg);
       }
     };
     this.page.onError = function(msg) {
-      return console.log("ERROR: " + msg);
+      return _this.debug("CLIENT: " + msg);
     };
     this.page.viewportSize = {
       width: 1024,
@@ -49,103 +43,58 @@ root["class"] = UA = (function() {
     };
   }
 
-  UA.prototype.tr = function(state, ev, newstate, fn) {
-    if (!this.rules[state]) {
-      this.rules[state] = {};
+  UA.prototype.debug = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    return console.log(args.join(" "));
+  };
+
+  UA.prototype.nextStep = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    if (this.step) {
+      this.debug("OK:", this.step.desc);
     }
-    return this.rules[state][ev] = {
+    this.step = this.steps.shift();
+    if (this.step) {
+      return this.step.fn.call(this, args);
+    } else {
+      return this.onStepComplete();
+    }
+  };
+
+  UA.prototype.then = function(desc, fn) {
+    return this.steps.push({
       fn: fn,
-      newstate: newstate
-    };
-  };
-
-  UA.prototype.run = function() {
-    var args, ev, tr;
-    ev = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    console.log("run() " + this.state + " -> " + ev);
-    if (!this.rules[this.state]) {
-      return console.log("No rules for state " + this.state);
-    }
-    if (!this.rules[this.state][ev]) {
-      return console.log("No event " + ev + " on state " + this.state);
-    }
-    tr = this.rules[this.state][ev];
-    if (!tr) {
-      return;
-    }
-    this.state = tr.newstate;
-    if (tr.fn) {
-      return tr.fn.call(this, args);
-    }
-  };
-
-  UA.prototype.jQuery = function(selector, fn) {
-    return this.page.evaluate((function(selector, fn) {
-      return fn.call($(selector));
-    }), selector, fn);
-  };
-
-  UA.prototype.box = function(selector) {
-    return this.jQuery(selector, function() {
-      return {
-        x: this.offset().left,
-        y: this.offset().top,
-        w: this.width(),
-        h: this.height()
-      };
+      desc: desc
     });
   };
 
-  UA.prototype.click = function(selector) {
-    var box;
-    box = this.box(selector);
-    return this.page.sendEvent("click", box.x + box.w / 2, box.y + box.h / 2);
+  UA.prototype.cleanup = function() {
+    var fs;
+    fs = require("fs");
+    return fs.removeTree(this.page.offlineStoragePath);
   };
 
-  UA.prototype.click_jq = function(selector) {
-    return this.jQuery(selector, function() {
-      return this.click();
-    });
+  UA.prototype.exit = function() {
+    this.cleanup();
+    return phantom.exit();
   };
 
-  UA.prototype.text = function(selector, text) {
-    this.click(selector);
-    return this.page.sendEvent("keypress", text);
+  UA.prototype.onError = function(msg) {
+    this.debug("ERROR: " + msg);
+    return this.exit();
   };
 
-  UA.prototype.exists = function(selector) {
-    return this.jQuery(selector, function() {
-      return this.length > 0;
-    });
-  };
-
-  UA.prototype.innerText = function(selector) {
-    return this.jQuery(selector, function() {
-      return this.text();
-    });
-  };
-
-  UA.prototype.wait = function(selector, ev, check) {
-    var handler, start,
-      _this = this;
-    if (check == null) {
-      check = function(selector) {
-        return _this.exists(selector);
-      };
+  UA.prototype.onTimeout = function() {
+    if (this.step) {
+      this.debug("TIMEOUT:", this.step.desc);
     }
-    start = new Date().getTime();
-    return handler = setInterval((function() {
-      var status;
-      status = check(selector);
-      if (status) {
-        clearInterval(handler);
-        _this.run(ev);
-      }
-      if (new Date().getTime() - start > _this.waitTimeout) {
-        clearInterval(handler);
-        return _this.run("timeout " + ev);
-      }
-    }), this.retryTimeout);
+    return this.exit();
+  };
+
+  UA.prototype.onStepComplete = function() {
+    return this.exit();
   };
 
   return UA;

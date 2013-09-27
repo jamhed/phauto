@@ -1,7 +1,7 @@
-UA = require("./UA.js").class
+UAJQ = require("./UAJQ.js").class
 login = require("./login.js").fn 
 keep_page = require("./keep-page.js").fn
 
-ua = keep_page login new UA
+ua = keep_page login new UAJQ
 
-ua.run "page/open", "http://localhost:3000/login"
+ua.nextStep "http://localhost:3000/login"
