@@ -1,5 +1,5 @@
 module.exports = 
-class UAJQ extends require("t/UA.coffee")
+class UAJQ extends require("UA.coffee")
    
    jQuery: (selector, fn) ->
       @page.evaluate ((selector, fn) -> return fn.call $(selector)), selector, fn

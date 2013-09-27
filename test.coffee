@@ -1,6 +1,6 @@
-UAJQ = require("t/UA/JQ.coffee")
-login = require("t/login.coffee")
-keep_page = require("t/keep-page.coffee")
+UAJQ = require("UA/JQ.coffee")
+login = require("login.coffee")
+keep_page = require("keep-page.coffee")
 
 ua = keep_page login new UAJQ
 
