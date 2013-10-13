@@ -1,8 +1,8 @@
 # PhantomJS automation.
 
 [PhantomJS](http://phantomjs.org) is a headless WebKit scriptable with a JavaScript API.
-This project is inspired by CasperJS, but much, much smaller, although provides all
-necessary methods to automate complex web pages tests.
+This project is inspired by CasperJS, but smaller and simplier, although provides
+enough methods to automate complex web pages tests or scraps.
 
 Key ideas:
 
@@ -17,7 +17,7 @@ $ phantomjs test.coffee
 
 Script consists of a number of steps executed in sequential order. Each step consists of two (three) parts:
 
-1. Current state processing, like checks for element, parsing content, etc
+1. Current state processing, like checks for elements, saving content, etc
 2. Action (page load, click)
 3. Wait condition
 
