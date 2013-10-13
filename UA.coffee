@@ -17,17 +17,18 @@ class UA
       @page.onResourceRequested = (r) => @debug "request() #{r.url}" if @verbose
       @page.onLoadFinished = (r) => @nextStep "onLoadFinished"
       @page.onConsoleMessage = (msg) => @debug "CONSOLE: #{msg}" if @verbose
-      @page.onError = (msg) => @debug "CLIENT: #{msg}"
+      @page.onError = (msg) => @debug "CLIENT ERROR: #{msg}"
 
       @page.viewportSize = { width: 1024, height: 768 }
 
-   debug: (args...) ->
-      console.log args.join(" ")
+   debug: (args...) -> console.log args.join(" ")
+
+   ok: (text, condition) -> if condition then @debug "OK:", text else @debug "FAIL:", text; @exit()
  
    nextStep: (args...) ->
-      @debug "OK:", @step.desc if @step
       @step = @steps.shift()
       if @step
+         @debug "DO:", @step.desc
          @step.fn.call(@, args)
       else
          @onStepComplete()
@@ -46,9 +47,8 @@ class UA
       @debug "ERROR: #{msg}"
       @exit()
 
-   onTimeout: () ->
+   onTimeout: ->
       @debug "TIMEOUT:", @step.desc if @step
       @exit()
 
-   onStepComplete: () ->
-      @exit()
+   onStepComplete: -> @exit()
