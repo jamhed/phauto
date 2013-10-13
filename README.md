@@ -5,6 +5,7 @@ This project is inspired by CasperJS, but much, much smaller, although provides 
 necessary methods to automate complex web pages tests.
 
 Key ideas:
+
 1. Rely on jQuery with html-element selecting
 2. Steps and wait() function
 
@@ -15,9 +16,13 @@ $ phantomjs test.coffee
 # Steps
 
 Script consists of a number of steps executed in sequential order. Each step consists of two (three) parts:
+
 1. Current state processing, like checks for element, parsing content, etc
 2. Action (page load, click)
 3. Wait condition
+
+Thus click() method combines selector to click, selector to wait and optional check-function (default is to check
+for existance).
 
 # Clicking and entering text
 
